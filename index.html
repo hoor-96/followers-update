@@ -421,7 +421,8 @@ const ACCOUNTS = [
   { k: "sc_mawhiba", acc: "Mawhiba", plat: "Snapchat" },
   { k: "yt_mawhiba", acc: "Mawhiba", plat: "YouTube" },
   { k: "x_alumni", acc: "@MawhibaAlumni", plat: "X" },
-  { k: "li_foundation", acc: "Mawhiba Foundation", plat: "LinkedIn" }
+  { k: "li_foundation", acc: "مجتمع موهبة", plat: "LinkedIn" },
+  { k: "li_mfoundation", acc: "Mawhiba Foundation", plat: "LinkedIn" }
 ];
 const PLATS = ["X", "Facebook", "LinkedIn", "TikTok", "Snapchat", "Instagram", "YouTube"];
 const BASE_PLAT = { X: 320334, Facebook: 171839, LinkedIn: 75348, TikTok: 68035, Snapchat: null, Instagram: 55774, YouTube: 39700 };
@@ -438,8 +439,9 @@ const HISTORY = [
 ];
 /* آخر قراءات مضمّنة: تظهر قبل وصول قاعدة البيانات، وتحل محلها قراءة محفوظة بالتاريخ نفسه */
 const EMBED = {
-  "2026-11-10": { date: "2026-11-10", accounts: { x_mawhiba: 310583, fb_mawhiba: 170060, tt_mawhibaportal: 128905, li_mawhiba: 90197, ig_mawhibaportal: 64463, sc_mawhiba: 63031, yt_mawhiba: 47800, x_alumni: 18476, li_foundation: 24 } },
-  "2026-11-15": { date: "2026-11-15", note: "تيك توك بتاريخ 15 نوفمبر وبقية الحسابات بتاريخ 10 نوفمبر، فالإجمالي تقدير مختلط التواريخ.", accounts: { x_mawhiba: 310583, fb_mawhiba: 170060, tt_mawhibaportal: 139100, li_mawhiba: 90197, ig_mawhibaportal: 64463, sc_mawhiba: 63031, yt_mawhiba: 47800, x_alumni: 18476, li_foundation: 24 } }
+  "2026-11-10": { date: "2026-11-10", accounts: { x_mawhiba: 310583, fb_mawhiba: 170060, tt_mawhibaportal: 128905, li_mawhiba: 90197, ig_mawhibaportal: 64463, sc_mawhiba: 63031, yt_mawhiba: 47800, x_alumni: 18476, li_foundation: 1300, li_mfoundation: 24 } },
+  "2026-11-15": { date: "2026-11-15", note: "تيك توك بتاريخ 15 نوفمبر وبقية الحسابات بتاريخ 10 نوفمبر، فالإجمالي تقدير مختلط التواريخ.", accounts: { x_mawhiba: 310583, fb_mawhiba: 170060, tt_mawhibaportal: 139100, li_mawhiba: 90197, ig_mawhibaportal: 64463, sc_mawhiba: 63031, yt_mawhiba: 47800, x_alumni: 18476, li_foundation: 1300, li_mfoundation: 24 } },
+  "2026-11-16": { date: "2026-11-16", note: "تيك توك بتاريخ 16 نوفمبر وبقية الحسابات بتاريخ 10 نوفمبر، فالإجمالي تقدير مختلط التواريخ.", accounts: { x_mawhiba: 310583, fb_mawhiba: 170060, tt_mawhibaportal: 140700, li_mawhiba: 90197, ig_mawhibaportal: 64463, sc_mawhiba: 63031, yt_mawhiba: 47800, x_alumni: 18476, li_foundation: 1300, li_mfoundation: 24 } }
 };
 
 /* أيقونات عامة للمنصات (تصميم خاص، ليست شعارات المنصات) */
@@ -758,7 +760,7 @@ async function initLive() {
 const XL_SHEET = "القراءات";
 const XL_HEAD = { "التاريخ": "date", "X @mawhiba": "x_mawhiba", "Facebook Mawhiba": "fb_mawhiba", "TikTok @mawhibaportal": "tt_mawhibaportal",
   "LinkedIn Mawhiba": "li_mawhiba", "Instagram mawhibaportal": "ig_mawhibaportal", "Snapchat Mawhiba": "sc_mawhiba", "YouTube Mawhiba": "yt_mawhiba",
-  "X @MawhibaAlumni": "x_alumni", "LinkedIn Mawhiba Foundation": "li_foundation", "ملاحظة": "note" };
+  "X @MawhibaAlumni": "x_alumni", "LinkedIn مجتمع موهبة": "li_foundation", "LinkedIn Mawhiba Foundation": "li_mfoundation", "ملاحظة": "note" };
 let xlPending = null;
 
 async function unzipEntries(buf) {
@@ -921,7 +923,7 @@ $("xlFile").addEventListener("change", ev => { handleXlFile(ev.target.files && e
 })();
 
 /* ===== المزامنة مع Google Sheets ===== */
-const GS = { server: "Google Sheets", tool: "get_values", input: { spreadsheetId: "1MCaGPT1UZ4f_IZh1SN_Jw4OFbklQTsnupKDw_nCz-t4", range: "'القراءات'!A1:L2000" } };
+const GS = { server: "Google Sheets", tool: "get_values", input: { spreadsheetId: "1MCaGPT1UZ4f_IZh1SN_Jw4OFbklQTsnupKDw_nCz-t4", range: "'القراءات'!A1:Z2000" } };
 let gsBusy = false, gsReady = false;
 function gsSet(t, kind) { const e = $("gsSt"); e.textContent = t; e.className = "gs-st " + (kind || ""); }
 function findValues(x, depth = 0) {
@@ -974,6 +976,42 @@ $("gsBtn").addEventListener("click", () => gsSync(true));
 $("saveBtn").addEventListener("click", saveSnap);
 render();
 initLive().then(() => fillForm(true));
+
+/* ===== نسخة GitHub: قراءة جدول Google Sheets مباشرة عند كل فتح ===== */
+/* ضع هنا رابط «النشر على الويب» بصيغة CSV إن توفر؛ وإلا تُستخدم قراءة الجدول المشارك للعموم */
+const SHEET_CSV_URL = "";
+const SHEET_FALLBACK = "https://docs.google.com/spreadsheets/d/1MCaGPT1UZ4f_IZh1SN_Jw4OFbklQTsnupKDw_nCz-t4/gviz/tq?tqx=out:csv&sheet=" + encodeURIComponent("القراءات");
+function parseCSV(t) {
+  const rows = []; let row = [], cur = "", q = false;
+  for (let i = 0; i < t.length; i++) {
+    const c = t[i];
+    if (q) { if (c === '"') { if (t[i + 1] === '"') { cur += '"'; i++; } else q = false; } else cur += c; }
+    else if (c === '"') q = true;
+    else if (c === ",") { row.push(cur); cur = ""; }
+    else if (c === "\n" || c === "\r") { if (c === "\r" && t[i + 1] === "\n") i++; row.push(cur); rows.push(row); row = []; cur = ""; }
+    else cur += c;
+  }
+  if (cur !== "" || row.length) { row.push(cur); rows.push(row); }
+  return rows.map(r => r.map(v => v.trim() === "" ? null : v.trim()));
+}
+async function loadSheet() {
+  if (window.claude) return;
+  try {
+    const url = (SHEET_CSV_URL || SHEET_FALLBACK) + ((SHEET_CSV_URL || SHEET_FALLBACK).includes("?") ? "&" : "?") + "_=" + Date.now();
+    const r = await fetch(url, { cache: "no-store" });
+    if (!r.ok) throw new Error("http " + r.status);
+    const res = rowsToSnaps(parseCSV(await r.text()));
+    if (res.error || !res.snaps.length) throw new Error(res.error || "empty");
+    const next = {};
+    res.snaps.forEach(x => { next[x.date] = { ...x, total: total(x), source: "gsheet" }; });
+    dbSnaps = next; render();
+    setChip("محدّثة من جدول المتابعين", "ok");
+  } catch (e) {
+    setChip("تعذر قراءة الجدول، المعروض آخر أرقام محفوظة في الصفحة", "warn");
+  }
+}
+loadSheet();
+setInterval(() => { if (!document.hidden) loadSheet(); }, 10 * 60 * 1000);
 let rz, lastW = $("chart").clientWidth;
 if (window.ResizeObserver) new ResizeObserver(() => { const w = $("chart").clientWidth; if (w === lastW) return; lastW = w; clearTimeout(rz); rz = setTimeout(drawChart, 80); }).observe($("chart"));
 </script>
