@@ -425,7 +425,7 @@ const ACCOUNTS = [
   { k: "li_mfoundation", acc: "Mawhiba Foundation", plat: "LinkedIn" }
 ];
 const PLATS = ["X", "Facebook", "LinkedIn", "TikTok", "Snapchat", "Instagram", "YouTube"];
-const BASE_PLAT = { X: 320334, Facebook: 171839, LinkedIn: 75348, TikTok: 68035, Snapchat: null, Instagram: 55774, YouTube: 39700 };
+const BASE_PLAT = { X: 320334, Facebook: 171839, LinkedIn: 75348, TikTok: 68035, Snapchat: 59000, Instagram: 55774, YouTube: 39700 };
 /* قراءات إجمالية فقط (بلا تفصيل حسابات) من التقارير السابقة */
 const HISTORY = [
   { d: "2026-03-31", v: 811228, label: "الربع الأول 2026" },
@@ -566,6 +566,7 @@ function render() {
       const cls = noBase ? "nobase" : (p.chg < 0 ? "neg" : "");
       let tag = "";
       if (noBase) tag = `<span class="tag">بلا خط أساس</span>`;
+      else if (p.name === "Snapchat") tag = `<span class="tag">تقديري</span>`;
       else if (p.chg === maxGrow && p.chg > 0) tag = `<span class="tag" style="background:var(--brand-soft);color:var(--brand-ink)">الأعلى نموًا</span>`;
       if (p.chg < 0) tag = `<span class="tag red">دون الأساس</span>`;
       return `<tr><td class="name"><span class="pn">${pIcon(p.name)}${p.name}</span>${tag}</td>
@@ -592,10 +593,10 @@ function render() {
     `<tr class="total"><td>الإجمالي</td><td></td><td class="n"><span class="num">${f(cur)}</span></td><td class="n"><span class="num ${gSum > 0 ? "pos" : ""}">${prevSnap ? sg(gSum) : "—"}</span></td></tr></tbody>`;
 
   /* الملاحظات */
-  const snap = plats.find(p => p.dec == null), tik = plats.find(p => p.name === "TikTok"), fb = plats.find(p => p.name === "Facebook");
+  const snap = plats.find(p => p.name === "Snapchat"), tik = plats.find(p => p.name === "TikTok"), fb = plats.find(p => p.name === "Facebook");
   const exSnap = (cur - snap.now - base) / base;
   const notes = [];
-  notes.push(["!", "سناب شات بلا رقم في خط الأساس", `يدخل سناب شات في الرقم الحالي بـ ${f(snap.now)} متابعًا دون رقم لديسمبر 2025، فيُحتسب كله زيادة، وهو ${achieved ? (snap.chg / achieved * 100).toFixed(1) : "0"}% من المحقق. من دونه يكون النمو ${pc(exSnap, 1)} (${sg(cur - snap.now - base)}) على خط الأساس نفسه. وأول رقم متاح له 63,500 في الربع الأول، ولم يتغير كثيرًا منذ ذلك الحين؛ يلزم تأكيد رقمه في ديسمبر 2025.`]);
+  notes.push(["!", "رقم سناب شات في ديسمبر 2025 تقديري", `رقم سناب شات لديسمبر 2025 (${f(snap.dec)}) تقديري، وزاد منذ ذلك بـ ${sg(snap.chg)} متابعًا. لم يُضف هذا الرقم إلى خط الأساس الرسمي (${f(base)})، لذا يُحتسب سناب شات كاملًا (${f(snap.now)}) ضمن الزيادة في الإجمالي. من دونه يكون النمو ${pc(exSnap, 1)} (${sg(cur - snap.now - base)}).`]);
   notes.push(["!", "الاعتماد الكبير على تيك توك", `أضاف تيك توك ${f(tik.chg)} متابعًا منذ ديسمبر 2025، أي ${achieved ? (tik.chg / achieved * 100).toFixed(1) : "0"}% من الزيادة المحققة. استمرار هذا الزخم يحدد هل يُبلغ المستهدف.`]);
   notes.push(fb.chg < 0
     ? ["!", "فيسبوك دون خط الأساس", `انخفض فيسبوك ${f(-fb.chg)} متابعًا عن ديسمبر 2025، وجاءت قراءتا سبتمبر وأكتوبر متطابقتين (170,513) وقد لا تكون محدثة.`]
